@@ -131,7 +131,7 @@ func (d *devserver) Run(ctx context.Context) error {
 	}
 
 	// Add a nice output to the terminal.
-	if isatty.IsTerminal(os.Stdout.Fd()) {
+	if isatty.IsTerminal(os.Stdin.Fd()) {
 		go func() {
 			<-time.After(25 * time.Millisecond)
 			addr := fmt.Sprintf("%s:%d", d.opts.Config.EventAPI.Addr, d.opts.Config.EventAPI.Port)

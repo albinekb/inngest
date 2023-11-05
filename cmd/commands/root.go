@@ -59,7 +59,7 @@ func Execute() {
 		panic(err)
 	}
 
-	if !isatty.IsTerminal(os.Stdout.Fd()) {
+	if !isatty.IsTerminal(os.Stdin.Fd()) {
 		// Alwyas use JSON when not in a terminal
 		viper.Set("json", true)
 	}
