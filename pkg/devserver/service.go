@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
-	"os"
 	"sync"
 	"time"
 
@@ -30,7 +29,6 @@ import (
 	"github.com/inngest/inngest/pkg/logger"
 	"github.com/inngest/inngest/pkg/sdk"
 	"github.com/inngest/inngest/pkg/service"
-	"github.com/mattn/go-isatty"
 )
 
 const (
@@ -131,7 +129,7 @@ func (d *devserver) Run(ctx context.Context) error {
 	}
 
 	// Add a nice output to the terminal.
-	if isatty.IsTerminal(os.Stdout.Fd()) {
+	if cli.IsTtyLogger() {
 		go func() {
 			<-time.After(25 * time.Millisecond)
 			addr := fmt.Sprintf("%s:%d", d.opts.Config.EventAPI.Addr, d.opts.Config.EventAPI.Port)

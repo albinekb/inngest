@@ -51,17 +51,22 @@ func Execute() {
 		},
 	}
 
+	var isTTY = isatty.IsTerminal(os.Stdout.Fd())
+
 	rootCmd.PersistentFlags().Bool("prod", false, "Use the production environment for the current command.")
-	rootCmd.PersistentFlags().Bool("json", false, "Output logs as JSON.  Set to true if stdout is not a TTY.")
+	rootCmd.PersistentFlags().Bool("json", !isTTY, "Output logs as JSON. Defaults to true if stdout is not a TTY. Override with --json=false to force pretty printing.")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose logging.")
 
 	if err := viper.BindPFlags(rootCmd.PersistentFlags()); err != nil {
 		panic(err)
 	}
 
-	if !isatty.IsTerminal(os.Stdout.Fd()) {
-		// Alwyas use JSON when not in a terminal
-		viper.Set("json", true)
+	if err := rootCmd.PersistentFlags().Parse(os.Args[1:]); err == nil {
+		if viper.GetBool("json") {
+			viper.Set("log.type", "json")
+		} else {
+			viper.Set("log.type", "tty")
+		}
 	}
 
 	// Register Top Level Commands

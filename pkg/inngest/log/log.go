@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
+	"github.com/inngest/inngest/pkg/cli"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
-	"golang.org/x/term"
 )
 
 const (
@@ -39,7 +39,7 @@ func From(ctx context.Context) *zerolog.Logger {
 
 func New(lvl zerolog.Level) *zerolog.Logger {
 	l := zerolog.New(os.Stderr).Level(lvl).With().Timestamp().Logger()
-	if ttyLogger() {
+	if cli.IsTtyLogger() {
 		l = l.Output(prettyFormatter)
 	}
 	return &l
@@ -47,7 +47,7 @@ func New(lvl zerolog.Level) *zerolog.Logger {
 
 func Copy(l zerolog.Logger) zerolog.Logger {
 	c := l.Output(os.Stderr)
-	if ttyLogger() {
+	if cli.IsTtyLogger() {
 		c = c.Output(prettyFormatter)
 	}
 	return c
@@ -59,15 +59,4 @@ func Default() *zerolog.Logger {
 		lvl = zerolog.InfoLevel
 	}
 	return New(lvl)
-}
-
-func ttyLogger() bool {
-	switch f := viper.GetString("log.type"); f {
-	case "tty":
-		return true
-	case "json":
-		return false
-	default:
-		return term.IsTerminal(int(os.Stdout.Fd()))
-	}
 }
